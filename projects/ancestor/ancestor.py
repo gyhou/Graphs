@@ -1,16 +1,50 @@
-from graph import Graph
-from util import Stack, Queue
+class Stack():
+    def __init__(self):
+        self.stack = []
+
+    def push(self, value):
+        self.stack.append(value)
+
+    def pop(self):
+        if self.size() > 0:
+            return self.stack.pop()
+        else:
+            return None
+
+    def size(self):
+        return len(self.stack)
+
+
+class Graph:
+    """
+    Represent a graph as a dictionary of vertices mapping labels to edges.
+    """
+
+    def __init__(self):
+        self.vertices = {}
+
+    def add_vertex(self, vertex_id):
+        """
+        Add a vertex to the graph.
+        """
+        self.vertices[vertex_id] = set()
+
+    def add_edge(self, v1, v2):
+        """
+        Add a directed edge to the graph.
+        """
+        if v1 in self.vertices and v2 in self.vertices:
+            self.vertices[v1].add(v2)
+        else:
+            raise IndexError("That vertex does not exist.")
 
 
 def earliest_ancestor(ancestors, starting_node):
-    vertices = set()
-    for ancestor in ancestors:
-        for vertex in ancestor:
-            vertices.add(vertex)
-
     graph = Graph()
-    for vertex in vertices:
-        graph.add_vertex(vertex)
+    for parent, child in ancestors:
+        graph.add_vertex(parent)
+        graph.add_vertex(child)
+        # graph.add_edge(child, parent)
     for parent, child in ancestors:
         graph.add_edge(child, parent)
 
@@ -18,7 +52,7 @@ def earliest_ancestor(ancestors, starting_node):
     stack.push([starting_node])
     # Create an empty Set to store visited vertices
     visited = set()
-    longest_path = []
+    longest_path = [-1]
     # While the que is not empty..
     while stack.size() > 0:
         # pop the first PATH
@@ -33,7 +67,6 @@ def earliest_ancestor(ancestors, starting_node):
                 if path[-1] < longest_path[-1]:
                     longest_path = path.copy()
             # Mark it as visited
-            # print(vertex)
             visited.add(vertex)
             # Then add A PATH to its neighbors to the back of the queue
             for next_vert in graph.vertices[vertex]:
@@ -43,7 +76,4 @@ def earliest_ancestor(ancestors, starting_node):
                 new_path.append(next_vert)
                 stack.push(new_path)
 
-    if len(longest_path) == 1:
-        return -1
-    else:
-        return longest_path[-1]
+    return longest_path[-1]
